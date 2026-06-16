@@ -1,0 +1,11 @@
+# local-only — never deployed to GitHub
+local/
+
+# rc backups created by the installer
+*.bak
+*.bak.*
+
+# OS / python cruft
+.DS_Store
+__pycache__/
+*.pyc
