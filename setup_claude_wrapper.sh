@@ -46,12 +46,20 @@ claude() {
       command claude --allow-dangerously-skip-permissions "$@" ;;
     *)
       local _n="$1"; shift
+      # Optional orchestration bind: only if THIS repo ships orchestration/agent-bind.sh.
+      # Keeps this tool decoupled; re-couples only when the orchestrator is present.
+      local _root _bind=""; local -a _ba=()
+      _root="$(git rev-parse --show-toplevel 2>/dev/null)"
+      if [ -n "$_root" ] && [ -x "$_root/orchestration/agent-bind.sh" ]; then
+        _bind="$("$_root/orchestration/agent-bind.sh" "$_n")"
+        [ -n "$_bind" ] && _ba=(--append-system-prompt "$_bind")
+      fi
       local _sid; _sid="$(python3 "$_CCK" resolve "$_n" 2>/dev/null)"
       if [ -n "$_sid" ]; then
         echo "↻ resuming '$_n' ($_sid)"
-        command claude --allow-dangerously-skip-permissions -r "$_sid" "$@"
+        command claude --allow-dangerously-skip-permissions -r "$_sid" "${_ba[@]}" "$@"
       else
-        command claude --allow-dangerously-skip-permissions --name "$_n" "$@"
+        command claude --allow-dangerously-skip-permissions --name "$_n" "${_ba[@]}" "$@"
       fi ;;
   esac
 }

@@ -61,6 +61,13 @@ and stores the `--name` value as `customTitle`. `cc-sessions.py` reads those to 
 `claude <name>` runs the native `claude -r <id>` (full history + context restored) when a match exists,
 or `claude --name <name>` when it doesn't. Nothing is stored outside Claude Code's own session files.
 
+**Orchestration-aware (optional, auto-detected).** If the repo ships
+[orchestrator-protocol](https://github.com/markoladika/orchestrator-protocol)'s
+`orchestration/agent-bind.sh`, `claude <name>` also **binds the session to the matching agent**:
+it points the session at `orchestration/agents/<name>/` (durable notebook) and, for a new name,
+asks once before creating that notebook. If that file isn't present, the wrapper behaves exactly as
+above — so this stays a standalone tool and only re-couples when the orchestrator is set up in the repo.
+
 ## Requirements
 - Claude Code CLI (`claude`) v2.1.32+
 - `python3` (session wrapper) and `jq` (status line)
